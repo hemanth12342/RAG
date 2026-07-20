@@ -1,27 +1,27 @@
-fastapi==0.111.0
-uvicorn[standard]==0.29.0
-python-multipart==0.0.9
-python-dotenv==1.0.1
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+python-multipart>=0.0.9
+python-dotenv>=1.0.1
 
 # LangChain ecosystem
-langchain==0.2.6
-langchain-community==0.2.6
-langchain-core==0.2.11
-langchain-text-splitters==0.2.2
-langchain-huggingface==0.0.3
-langchain-groq==0.1.6
+langchain>=0.2.6
+langchain-community>=0.2.6
+langchain-core>=0.2.11
+langchain-text-splitters>=0.2.2
+langchain-huggingface>=0.0.3
+langchain-groq>=0.1.6
 
-# Vector store
-faiss-cpu==1.8.0
+# Vector store — use latest available version
+faiss-cpu>=1.7.0
 
 # Embeddings
-sentence-transformers==3.0.1
+sentence-transformers>=2.2.0
 
 # Document loaders
-pypdf==4.2.0
-docx2txt==0.8
-openpyxl==3.1.4
-pandas==2.2.2
+pypdf>=4.0.0
+docx2txt>=0.8
+openpyxl>=3.1.0
+pandas>=2.0.0
 
 # Pydantic
-pydantic==2.7.4
+pydantic>=2.7.4
