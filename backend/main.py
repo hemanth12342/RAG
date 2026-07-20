@@ -16,9 +16,9 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_groq import ChatGroq
-from langchain.chains import create_retrieval_chain
-from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_core.output_parsers import StrOutputParser
 
 import tempfile
 
@@ -182,9 +182,8 @@ async def chat(req: ChatRequest):
         )
 
     try:
-        # Fixed model name: llama3-8b-8192 is a valid, fast Groq model
         llm = ChatGroq(
-            model_name="llama3-8b-8192",
+            model_name="openai/gpt-oss-120b",
             temperature=0,
             api_key=groq_api_key,
         )
@@ -197,16 +196,24 @@ Be concise and accurate.
 Context:
 {context}
 
-Question: {input}
+Question: {question}
 
 Answer:""")
 
-        document_chain = create_stuff_documents_chain(llm, prompt)
-        retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
-        retrieval_chain = create_retrieval_chain(retriever, document_chain)
+        # Modern LCEL chain — compatible with langchain 1.x
+        def format_docs(docs):
+            return "\n\n".join(doc.page_content for doc in docs)
 
-        response = retrieval_chain.invoke({"input": req.question})
-        answer = response.get("answer", "No answer could be generated.")
+        retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
+
+        rag_chain = (
+            {"context": retriever | format_docs, "question": RunnablePassthrough()}
+            | prompt
+            | llm
+            | StrOutputParser()
+        )
+
+        answer = rag_chain.invoke(req.question)
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"LLM error: {str(e)}")
