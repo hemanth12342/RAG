@@ -1,0 +1,35 @@
+# Python / local dev
+__pycache__/
+*.pyc
+
+# Gradio internals
+.gradio/
+
+# Large media / recordings
+*.mov
+*.mp4
+*.avi
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+*.pyo
+.env
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# Uploaded temp files
+*.pdf
+*.docx
+*.xlsx
+*.xls
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

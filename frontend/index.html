@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Document Analyst — Chat with Your Documents</title>
+  <meta name="description" content="Upload PDF, DOCX, or Excel files and instantly chat with your data using Groq's high-speed AI powered by RAG technology." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Animated background orbs -->
+  <div class="bg-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <div class="app-container">
+
+    <!-- ═══════════════════════════════════════════
+         SIDEBAR — Upload & Status
+    ════════════════════════════════════════════ -->
+    <aside class="sidebar" role="complementary" aria-label="Document upload panel">
+
+      <!-- Logo / Branding -->
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand-title">DocAnalyst</h1>
+          <p class="brand-subtitle">AI-Powered by Groq</p>
+        </div>
+      </div>
+
+      <div class="sidebar-divider"></div>
+
+      <!-- Step 1 — Upload -->
+      <section class="upload-section" aria-labelledby="upload-heading">
+        <p id="upload-heading" class="section-label">
+          <span class="step-badge">1</span>
+          Upload Document
+        </p>
+
+        <!-- Drop Zone -->
+        <div
+          id="drop-zone"
+          class="drop-zone"
+          role="button"
+          tabindex="0"
+          aria-label="Upload document — click or drag and drop a PDF, DOCX, or Excel file"
+          aria-describedby="file-types-hint"
+        >
+          <input
+            type="file"
+            id="file-input"
+            accept=".pdf,.docx,.xlsx,.xls"
+            aria-hidden="true"
+            tabindex="-1"
+          />
+          <div class="drop-zone-icon" aria-hidden="true">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+          </div>
+          <p class="drop-zone-primary">Drop your file here</p>
+          <p class="drop-zone-secondary" id="file-types-hint">or click to browse</p>
+          <div class="file-badges" aria-hidden="true">
+            <span class="badge">PDF</span>
+            <span class="badge">DOCX</span>
+            <span class="badge">Excel</span>
+          </div>
+        </div>
+
+        <!-- Selected file preview -->
+        <div id="file-preview" class="file-preview hidden" aria-live="polite">
+          <div class="file-preview-icon" aria-hidden="true">📄</div>
+          <div class="file-preview-info">
+            <span id="file-name" class="file-name"></span>
+            <span id="file-size" class="file-size"></span>
+          </div>
+          <button id="remove-file-btn" class="remove-file-btn" aria-label="Remove selected file" title="Remove file">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Process Button -->
+        <button id="process-btn" class="btn-primary" disabled aria-disabled="true">
+          <span class="btn-text">Process Document</span>
+          <span class="btn-spinner hidden" aria-hidden="true"></span>
+        </button>
+      </section>
+
+      <!-- Status Panel -->
+      <div
+        id="status-panel"
+        class="status-panel hidden"
+        role="status"
+        aria-live="polite"
+        aria-label="Processing status"
+      ></div>
+
+      <div class="sidebar-divider"></div>
+
+      <!-- Step 2 label -->
+      <section class="chat-step-label" aria-label="Step 2 instruction">
+        <p class="section-label">
+          <span class="step-badge step-badge--2">2</span>
+          Chat with Document
+        </p>
+        <p class="section-hint">Upload a document above to unlock the chat.</p>
+      </section>
+
+      <!-- Stats / session info -->
+      <div id="session-info" class="session-info hidden" aria-live="polite">
+        <div class="stat-row">
+          <span class="stat-label">Session</span>
+          <span id="stat-session" class="stat-value">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Chunks</span>
+          <span id="stat-chunks" class="stat-value">—</span>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="sidebar-footer">
+        <p>Powered by <strong>LangChain</strong> + <strong>Groq</strong></p>
+        <p>FAISS Vector Search · HuggingFace Embeddings</p>
+      </footer>
+    </aside>
+
+    <!-- ═══════════════════════════════════════════
+         MAIN — Chat Interface
+    ════════════════════════════════════════════ -->
+    <main class="chat-panel" role="main" aria-label="Chat interface">
+
+      <!-- Chat Header -->
+      <header class="chat-header">
+        <div class="chat-header-left">
+          <div class="model-indicator" aria-label="Current AI model">
+            <span class="model-dot" aria-hidden="true"></span>
+            <span class="model-name">llama3-8b-8192</span>
+          </div>
+        </div>
+        <div class="chat-header-right">
+          <button id="clear-chat-btn" class="btn-ghost" aria-label="Clear chat history">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+              <path d="M10 11v6M14 11v6"/>
+            </svg>
+            Clear
+          </button>
+        </div>
+      </header>
+
+      <!-- Messages Area -->
+      <div
+        id="messages-container"
+        class="messages-container"
+        role="log"
+        aria-label="Chat messages"
+        aria-live="polite"
+      >
+        <!-- Empty state -->
+        <div id="empty-state" class="empty-state">
+          <div class="empty-state-icon" aria-hidden="true">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+          </div>
+          <h2 class="empty-state-title">Ready to Analyse</h2>
+          <p class="empty-state-desc">Upload a PDF, DOCX, or Excel file on the left, then ask anything about its contents.</p>
+          <div class="example-questions" aria-label="Example questions to try">
+            <button class="example-pill" data-question="Summarise this document in 3 bullet points." aria-label="Try: Summarise this document">📝 Summarise this document</button>
+            <button class="example-pill" data-question="What are the key findings?" aria-label="Try: Key findings">🔍 Key findings</button>
+            <button class="example-pill" data-question="What are the main conclusions?" aria-label="Try: Main conclusions">✅ Main conclusions</button>
+            <button class="example-pill" data-question="List the important dates mentioned." aria-label="Try: Important dates">📅 Important dates</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Typing Indicator (hidden until AI is thinking) -->
+      <div id="typing-indicator" class="typing-indicator hidden" role="status" aria-label="AI is thinking">
+        <div class="typing-avatar" aria-hidden="true">AI</div>
+        <div class="typing-dots" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+        <span class="typing-text">Thinking…</span>
+      </div>
+
+      <!-- Input Bar -->
+      <div class="input-bar" role="form" aria-label="Send a message">
+        <textarea
+          id="message-input"
+          class="message-input"
+          placeholder="Ask anything about your document…"
+          rows="1"
+          disabled
+          aria-label="Message input"
+          aria-multiline="true"
+          aria-disabled="true"
+        ></textarea>
+        <button
+          id="send-btn"
+          class="send-btn"
+          disabled
+          aria-label="Send message"
+          aria-disabled="true"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+      </div>
+      <p class="input-hint" aria-hidden="true">Press <kbd>Enter</kbd> to send · <kbd>Shift+Enter</kbd> for new line</p>
+
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
