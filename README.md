@@ -81,7 +81,7 @@ cd frontend && npx serve .
 |-------|-----------|
 | Frontend | HTML5 · CSS3 (Glassmorphism) · Vanilla JS |
 | Backend | Python 3.11 · FastAPI · Uvicorn |
-| LLM | Groq (llama3-8b-8192) |
+| LLM | Groq (openai/gpt-oss-120b) |
 | Embeddings | HuggingFace all-MiniLM-L6-v2 |
 | Vector Store | FAISS (in-memory, per session) |
 | Orchestration | LangChain |
