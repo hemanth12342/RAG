@@ -44,8 +44,15 @@ app.add_middleware(
 # --- In-memory session store: session_id -> FAISS vectorstore ---
 sessions: Dict[str, FAISS] = {}
 
-# --- Shared embeddings model (loaded once at startup to save time) ---
-embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+# --- Shared embeddings model (lazy loaded to prevent blocking server startup) ---
+_embeddings = None
+
+def get_embeddings():
+    global _embeddings
+    if _embeddings is None:
+        # Load this only when first needed to prevent timeout during Render deploy
+        _embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+    return _embeddings
 
 
 # --- Request/Response Models ---
@@ -145,7 +152,7 @@ async def upload_document(file: UploadFile = File(...)):
 
     # Build FAISS vector store
     try:
-        vectorstore = FAISS.from_documents(chunks, embeddings)
+        vectorstore = FAISS.from_documents(chunks, get_embeddings())
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to create embeddings: {str(e)}")
 
