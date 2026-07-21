@@ -11,10 +11,11 @@ langchain-text-splitters>=0.2.2
 langchain-huggingface>=0.0.3
 langchain-groq>=0.1.6
 
-# Vector store — use latest available version
+# Vector store
 faiss-cpu>=1.7.0
 
-# Embeddings
+# Embeddings — CPU-only torch to avoid massive CUDA packages on Render free tier
+torch>=2.0.0+cpu
 sentence-transformers>=2.2.0
 
 # Document loaders
