@@ -7,7 +7,7 @@
 // Update BACKEND_URL when deploying:
 //   • Local dev  → "http://localhost:8000"
 //   • Render     → "https://your-service-name.onrender.com"
-const BACKEND_URL = "http://localhost:8000";
+const BACKEND_URL = "https://rag-1-mxyr.onrender.com";
 
 // ── State ────────────────────────────────────────────────
 let sessionId = null;
