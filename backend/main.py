@@ -190,7 +190,7 @@ async def chat(req: ChatRequest):
 
     try:
         llm = ChatGroq(
-            model_name="llama3-8b-8192",
+            model_name="llama3-70b-8192",
             temperature=0,
             api_key=groq_api_key,
         )
